@@ -1,21 +1,31 @@
-# require './input_easy.txt'
+class ReadFile
+	def self.read_input(file_path)
+	file = file_path
+	file_lines = []
+	fileObj = File.new(file, "r")
+		while (line = fileObj.gets)
+	 		file_lines << line
+		end
+		file_lines
+	end
+end
 
 class TreeOutput
-	@input00 = [["5"], ["1 2"], ["2 3"], ["2 4"], ["5 1"], ["6"], ["add 4 30"], ["add 5 20"], ["max 4 5"], ["add 2 -20"], ["max 4 5"], ["max 3 4"]]
+	@input_problem_array = ReadFile.read_input("/Users/igrant/CancerIQ/samples/input01.txt")
 	@nodes_array = []
 	@instructions_array = []
 	@unique_nodes_hash = {}
 	@path_hash = {}
 
 	def self.output
-		split_arrays
+		split_lines
 		make_nodes_hash
 		find_common_node
 		read_instructions
 	end
-	def self.split_arrays
-		@input00.each do |array|
-			new_array = array[0].split
+	def self.split_lines
+		@input_problem_array.each do |string|
+			new_array = string.split
 			if new_array.length < 3
 				@nodes_array << new_array
 			else
@@ -101,22 +111,9 @@ class TreeOutput
 	end
 end
 
-class ReadFile
-	@file_lines = []
-	def self.read_input
-	puts Dir.pwd
-	fileObj = File.new("/Users/igrant/CancerIQ/challenges_2/input_easy.txt", "r")
-	while (line = fileObj.gets)
- 		@file_lines << line
- 		puts line.inspect
-	end
-	fileObj.close
-	end
-end
+# ReadFile.read_input("/Users/igrant/CancerIQ/samples/input00.txt")
 
-ReadFile.read_input
-
-# TreeOutput.output
+TreeOutput.output
 
 # Create graph
 # 1. read file line by line, ignoring empty lines OR take input as an array of an array of string for now like the file read would produce
