@@ -1,3 +1,5 @@
+# require './input_easy.txt'
+
 class TreeOutput
 	@input00 = [["5"], ["1 2"], ["2 3"], ["2 4"], ["5 1"], ["6"], ["add 4 30"], ["add 5 20"], ["max 4 5"], ["add 2 -20"], ["max 4 5"], ["max 3 4"]]
 	@nodes_array = []
@@ -99,7 +101,22 @@ class TreeOutput
 	end
 end
 
-TreeOutput.output
+class ReadFile
+	@file_lines = []
+	def self.read_input
+	puts Dir.pwd
+	fileObj = File.new("/Users/igrant/CancerIQ/challenges_2/input_easy.txt", "r")
+	while (line = fileObj.gets)
+ 		@file_lines << line
+ 		puts line.inspect
+	end
+	fileObj.close
+	end
+end
+
+ReadFile.read_input
+
+# TreeOutput.output
 
 # Create graph
 # 1. read file line by line, ignoring empty lines OR take input as an array of an array of string for now like the file read would produce
