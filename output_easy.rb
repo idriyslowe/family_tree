@@ -64,38 +64,24 @@ class TreeOutput
 	# DOUBLE CHECK THAT NEGATIVE VALUES ARE ADDED TO ALL IN THE CASE OF 1
 	def self.add_query(array)
 		# leave final path here so it only deletes when you call it
-		@final_path = []
+		@final_path = [array[1]]
 		if array[1] == "1"
-			@unique_nodes_hash.each { |node, value| value += array[2].to_i }
+			@unique_nodes_hash.each do |node, value|
+				@unique_nodes_hash[node] += array[2].to_i
+			end
 		else
-			@unique_nodes_hash[array[1]] += array[2].to_i
-			final_path = find_path_to_end(array[1])
+			node_tree = find_path_to_end(array[1])
+			node_tree.each do |node|
+				@unique_nodes_hash[node] += array[2].to_i
+			end
 		end
+		# puts @final_path.inspect
 	end
 	# DETERMINE END NODES! ONLY TOUCH ONE OTHER NODE. ITS CLOSEST PARENT DOESN'T HAVE CHILDREN
 	def self.end_nodes
 		@end_nodes = @path_hash.select { |node, relatives| relatives.length == 1 && node.to_i > 1 }
 	end
-	# START NODE IS ALREADY AFFECTED ABOVE. DONT FORGET TO KEEP STARTING RELATIVES!
-	# def self.find_path_to_end(start_node)
-	# 	puts "Start node #{start_node}"
-	# 	# !!start_node = 2
-	# 	@final_path = []		
-	# 	starting_relatives = @path_hash.select { |node, relatives| relatives.include?(start_node) && node.to_i > start_node.to_i }
-	# 	# !!starting_relatives =  {"4"=>["2", "8"], "5"=>["2"]}
-	# 	@final_path << starting_relatives.keys
-	# 	starting_relatives.values.each do |relatives|
-	# 	# !!relatives = ["2", "8"] ["2"]
-	# 		relatives.each do |relative|
-	# 			# !!relative = "2", "8", "2" ignoring all twos below
-	# 			@final_path << @path_hash[relative] unless relative == start_node
-	# 			# final_path = [["4", "5"], ["4", "9"]]
-	# 			puts "relative #{relative} and it's values #{@path_hash[relative]}. Final path\n#{@final_path.inspect}"
-	# 		end
-	# 	end
-	# 	# continue retrieving node values until you run out
-	# end
-
+# THREE ISN'T ADDING
 	def self.find_path_to_end(start_node)
 		last_crawl = []		
 		starting_relatives = @path_hash.select { |node, relatives| relatives.include?(start_node) && node.to_i > start_node.to_i }
@@ -108,9 +94,10 @@ class TreeOutput
 		end
 		last_crawl.flatten!
 		last_crawl.each do |node|
-			find_path_to_end(node)
+			@final_path << @path_hash[node] unless node == start_node
 		end
-		full_path = @final_path.flatten
+		# puts @final_path.flatten.uniq.inspect
+		full_path = @final_path.flatten.uniq
 	end	
 
 	def self.sub_path(sub_array)
@@ -148,7 +135,7 @@ class TreeOutput
 	def self.calculate_max(ultimate_path)
 		values = @unique_nodes_hash.select { |node, value| ultimate_path.include?(node) }
 		max = values.values.max_by { |value| value }
-		# puts max
+		puts max
 	end
 end
 
