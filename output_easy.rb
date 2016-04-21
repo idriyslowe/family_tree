@@ -21,7 +21,7 @@ class TreeOutput
 		make_nodes_hash
 		read_instructions
 	end
-	# CHECKS OUT!!! CREATES NODES, INSTRUCTIONS ARRAY, AND HOLDS ONTO NODE TOTAL
+
 	def self.split_lines
 		@input_problem_array.each do |string|
 			new_array = string.split
@@ -34,7 +34,7 @@ class TreeOutput
 		@instructions_array << @nodes_arrays.pop
 		@nodes_total = @nodes_arrays.shift
 	end
-	# CHECKS OUT!!! INITIALIZES HASH WITH ALL NODES VALUE 0
+
 	def self.make_nodes_hash
 		new_array = @nodes_arrays.flatten.uniq
 		new_array.each do |node|
@@ -53,15 +53,12 @@ class TreeOutput
 			max_query(query_array) if query_array[0] == "max"
 		end
 	end
-	# DOUBLE CHECK THAT NEGATIVE VALUES ARE ADDED TO ALL IN THE CASE OF 1
 	def self.add_query(array)
-		# add too all if node is one
 		if array[1] == "1"
 			@unique_nodes_hash.each do |node, value|
 				@unique_nodes_hash[node] += array[2].to_i
 			end
 		elsif end_node?(array[1])
-		# add to only itself if node is end node...
 			@unique_nodes_hash[array[1]] += array[2].to_i
 		else
 			@unique_nodes_hash[array[1]] += array[2].to_i
@@ -69,9 +66,7 @@ class TreeOutput
 			family_tree.each do |node|
 				@unique_nodes_hash[node] += array[2].to_i
 			end
-			# puts "Add query family tree #{array[1]}: #{family_tree.inspect}"
 		end
-		puts @unique_nodes_hash.inspect
 	end
 	def self.crawl_tree(start_node)
 		family_tree = []
@@ -91,14 +86,38 @@ class TreeOutput
 				loop_through_relatives(cousins, depth + 1, final_nodes.push(cousins))
 			end
 		end
-		# puts "Node array #{node_array} Depth #{depth} Nodes #{final_nodes}"
 		final_nodes
 	end
 
+# find path from LARGER NODE down to ONE
+# if SMALLER NODE found before one, stop
+# else continue to ONE. Do the same with SMALLER NODE..
+# if 1 is the common node, crawl from the larger to the smaller using ONE as join.
+# OBVS, if the LOWER NODE is ONE, the LARGER NODE crawl will do the trick.
 	def self.max_query(array)
-		# find all arrays that contain the first node
-		puts "max"
+		full_path = []
+		higher_node = [array[1].to_i, array[2].to_i].max.to_s
+		lower_node = [array[1].to_i, array[2].to_i].min.to_s
+		full_path << lower_node
+		full_path << higher_node
+		# finds lower neighbor to higher_node
+		full_path << higher_node_crawl(lower_node, higher_node)
+		# full_path << lower_node_crawl(lower_node, higher_node)
+		puts "Full path #{full_path}"
 	end
+
+	def self.higher_node_crawl(lower_node, higher_node, full_path = [])
+		if !full_path.include?(lower_node) || !full_path.include?("1")
+			first_low_neighbor = @nodes_arrays.select { |array| array.include?(higher_node) }.flatten!
+			first_low_neighbor.delete_if { |node| node.to_i >= higher_node.to_i } if first_low_neighbor != nil
+			# this next number may be multiple numbers. update code
+			higher_node_crawl(lower_node, first_low_neighbor[0], full_path.push(first_low_neighbor)) if first_low_neighbor != nil
+		end
+		puts "Full path #{full_path}"
+		full_path
+		# this is the case ignored by above statement
+	end
+
 end
 
 TreeOutput.output
