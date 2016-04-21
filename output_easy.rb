@@ -89,11 +89,6 @@ class TreeOutput
 		final_nodes
 	end
 
-# find path from LARGER NODE down to ONE
-# if LOWER NODE found before one, stop
-# do the same with the LOWER NODE
-# if 1 is the common node, crawl from the larger to the smaller using ONE as join.
-# OBVS, if the LOWER NODE is ONE, the LARGER NODE crawl will do the trick.
 	def self.max_query(array)
 		full_path = []
 		higher_node = [array[1].to_i, array[2].to_i].max.to_s
@@ -115,6 +110,8 @@ class TreeOutput
 		puts "Start node #{start_node} Other node #{other_node} Full path\n#{full_path}"
 		full_path
 	end
+
+	def self.
 end
 
 TreeOutput.output
