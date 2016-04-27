@@ -22,12 +22,12 @@ class Node
 end
 
 class Graph
-	@graph = ReadFile.read_input("/Users/igrant/family_tree/samples/input02.txt")
 	@nodes_arrays = []
 	@queries_array = []
 	@node_collection = []
 
-	def self.output
+	def self.output(file_path)
+		@graph = ReadFile.read_input(file_path)
 		split_lines
 		make_node_collection
 		update_node_relatives
@@ -35,18 +35,15 @@ class Graph
 	end
 	def self.split_lines
 		@graph.each do |string|
-			new_array = string.split
-			if new_array.length < 3
-				@nodes_arrays << new_array
+			string_array = string.split
+			if string_array.length < 3
+				@nodes_arrays << string_array
 			else
-				@queries_array << new_array
+				@queries_array << string_array
 			end
 		end
-		# WHY ISN'T THE POP PUSH WORKING?!
 		@queries_array.push(@nodes_arrays.pop)
 		@nodes_total = @nodes_arrays.shift
-		# puts "Last in nodes array #{@nodes_arrays.pop}"
-		# puts "Queries array #{@queries_array.inspect}"
 	end
 	def self.find_relatives(node)
 		@nodes_arrays.select { |array| array.include?(node) }
@@ -79,7 +76,6 @@ class Graph
 		@node_collection.find {|node| node.name == name }
 	end
 	def self.add_query(array)
-		# puts "ADD QUERY #{array[1]}"
 		if array[1] == "1"
 			@node_collection.each do |node|
 				node.value += array[2].to_i
@@ -92,15 +88,29 @@ class Graph
 			root = find_node("1")
 			node = find_node(array[1])
 			tree_search = BreadthSearch.new(node)
-			avoid = tree_search.shortest_path_to(root)
-			ugh_search = tree_search.find_descendants(node, avoid)
-			family_tree << ugh_search
+			parents = tree_search.shortest_path_to(root)
+			family_tree << find_descendants(node, parents)
 			family_tree.flatten!
 			family_tree.each do |node|
 				node.value += array[2].to_i
 			end
 		end
 	end
+	def self.find_descendants(start_node, parents_array)
+		visited = [start_node]
+		queue = []
+		queue << start_node
+		while queue.any?
+			current_node = queue.shift
+			current_node.relatives.each do |relative|
+				next if visited.include?(relative) || parents_array.include?(relative)
+				queue << relative
+				visited << relative
+				current_node = relative
+			end
+		end
+		visited
+	end	
 	def self.max_query(array)
 		values = []
 		source_node = find_node(array[1])
@@ -115,7 +125,6 @@ class Graph
 end
 
 class BreadthSearch
-	attr_accessor :visited
 	def initialize(source_node)
 		@source_node = source_node
 		@visited = []
@@ -133,26 +142,6 @@ class BreadthSearch
     end
 
     path.unshift(@source_node)
-	end
-	def find_descendants(start_node, parents_array)
-		# visited collects all
-		visited = [start_node]
-		# queue holds what we're searching
-		queue = []
-		queue << start_node
-		# find descendants of node 2
-		while queue.any?
-			current_node = queue.shift
-			current_node.relatives.each do |relative|
-				next if visited.include?(relative) || parents_array.include?(relative)
-				# relative 1, 2, 4, 5
-				# add relatives to path unless it's in the parents_array
-				queue << relative
-				visited << relative
-				current_node = relative
-			end
-		end
-		visited
 	end
 	private
 	def breadth_first_search(node)
@@ -175,5 +164,5 @@ class BreadthSearch
 	end
 end
 
-Graph.output
+Graph.output("/Users/igrant/family_tree/challenges_2/input_hard.txt")
 
